@@ -1,0 +1,21 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/scrape-listings",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/send-alerts",
+      "schedule": "0,30 * * * *"
+    },
+    {
+      "path": "/api/cron/trial-reminders",
+      "schedule": "0 9 * * *"
+    }
+  ],
+  "functions": {
+    "app/api/cron/scrape-listings/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}
