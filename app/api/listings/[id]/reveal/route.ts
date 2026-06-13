@@ -10,9 +10,8 @@ import { pool, getMonthlyLeadUsage, trackLeadReveal } from '@/lib/db';
 import { requireAuth, requirePlan, AuthError } from '@/lib/auth';
 import { PLANS } from '@/lib/billing';
 
-type Ctx = { params: { id: string } };
-
-export async function POST(req: Request, { params }: Ctx) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const user = await requireAuth(req);
     requirePlan(user, 'starter');
@@ -37,11 +36,11 @@ export async function POST(req: Request, { params }: Ctx) {
     const { rows } = await pool.query(`
       SELECT broker_name, broker_email, broker_phone, broker_company, source_url
       FROM franchise_listings WHERE id = $1
-    `, [params.id]);
+    `, [id]);
 
     if (!rows[0]) return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
 
-    await trackLeadReveal(user.id, params.id);
+    await trackLeadReveal(user.id, id);
 
     return NextResponse.json({ contact: rows[0] });
 

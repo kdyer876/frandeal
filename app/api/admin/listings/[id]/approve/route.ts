@@ -13,9 +13,8 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { requireAdmin, AuthError } from '@/lib/auth';
 
-type Ctx = { params: { id: string } };
-
-export async function POST(req: Request, { params }: Ctx) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     await requireAdmin(req);
     const body = await req.json().catch(() => ({}));
@@ -38,7 +37,7 @@ export async function POST(req: Request, { params }: Ctx) {
              last_seen_at   = now()
            WHERE id = $1 AND listing_status = 'pending'
            RETURNING id, brand_name, is_exclusive`,
-      [params.id]
+      [id]
     );
 
     if (!rows[0]) {

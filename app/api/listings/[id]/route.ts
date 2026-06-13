@@ -8,12 +8,11 @@ import { pool, getListingWithFDD, getMonthlyLeadUsage, trackLeadReveal } from '@
 import { optionalAuth, requireAuth, requirePlan, AuthError } from '@/lib/auth';
 import { PLANS } from '@/lib/billing';
 
-type Ctx = { params: { id: string } };
-
 // ── GET /api/listings/:id ─────────────────────────────────────────────────────
-export async function GET(req: Request, { params }: Ctx) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const user    = await optionalAuth(req);
-  const listing = await getListingWithFDD(params.id);
+  const listing = await getListingWithFDD(id);
 
   if (!listing) {
     return NextResponse.json({ error: 'Listing not found' }, { status: 404 });

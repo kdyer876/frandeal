@@ -12,9 +12,8 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { requireAdmin, AuthError } from '@/lib/auth';
 
-type Ctx = { params: { id: string } };
-
-export async function POST(req: Request, { params }: Ctx) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const admin = await requireAdmin(req);
     const body  = await req.json().catch(() => ({}));
@@ -31,7 +30,7 @@ export async function POST(req: Request, { params }: Ctx) {
                            )
       WHERE id = $1 AND listing_status = 'pending'
       RETURNING id, brand_name
-    `, [params.id, reason, admin.email]);
+    `, [id, reason, admin.email]);
 
     if (!rows[0]) {
       return NextResponse.json({ error: 'Listing not found or not pending' }, { status: 404 });
