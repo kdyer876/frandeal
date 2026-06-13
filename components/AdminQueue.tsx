@@ -43,7 +43,7 @@ export function AdminQueue() {
     load();
   }, []);
 
-  function authHeaders() {
+  function authHeaders(): Record<string, string> {
     const token = localStorage.getItem('ff_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
